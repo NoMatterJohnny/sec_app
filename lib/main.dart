@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:sec_app/models/trasaction.dart';
 
-import 'widgets/new_transaction.dart';
-import 'widgets/transaction_list.dart';
+import './models/trasaction.dart';
+import './widgets/new_transaction.dart';
+import './widgets/transaction_list.dart';
+import './widgets/chart.dart';
 
 void main(List<String> args) {
   runApp(MyApp());
@@ -20,13 +21,13 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.amber,
           fontFamily: 'Quicksand',
           textTheme: ThemeData.light().textTheme.copyWith(
-              title: TextStyle(
+              caption: TextStyle(
                   fontFamily: 'OpenSans',
                   fontWeight: FontWeight.bold,
                   fontSize: 18)),
           appBarTheme: AppBarTheme(
             textTheme: ThemeData.light().textTheme.copyWith(
-                title: TextStyle(fontFamily: 'OpenSans', fontSize: 20)),
+                caption: TextStyle(fontFamily: 'OpenSans', fontSize: 20)),
           )),
       home: MyHomePage(),
     );
@@ -43,6 +44,16 @@ class _MyHomePageState extends State<MyHomePage> {
   final titleController = TextEditingController();
   final amountController = TextEditingController();
   final List<Transaction> _userTransactions = [];
+
+  List<Transaction> get _recentTransaction {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
 
   void _addNewTransaction(String txTitle, double txAmount) {
     final newTx = Transaction(
@@ -84,14 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           // mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Container(
-              height: 20,
-              child: Card(
-                color: Colors.pink,
-                child: Center(child: Text('CHART')),
-                elevation: 5,
-              ),
-            ),
+            Chart(_recentTransaction),
             TransactionList(_userTransactions),
           ],
         ),
